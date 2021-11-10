@@ -60,8 +60,11 @@ async function run() {
       //load appointments from api based on user email#7
       app.get('/appointments',verifyToken, async(req, res) => {
         const email = req.query.email;
+        //server time changed other country server site
+        const date =req.query.date; 
          //filter by date
-        const date =new Date(req.query.date).toLocaleDateString();     
+            
+        // const date =new Date(req.query.date).toLocaleDateString();     
         //console.log(date)
         const query = { email: email, date: date }
         // console.log(query)
