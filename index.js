@@ -10,11 +10,9 @@ const { MongoClient } = require('mongodb');
 const port = process.env.PORT || 5000
 
 //jwt token
-// doctors-portal-firebase-adminsdk.json
-
 
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-// const serviceAccount = require('./doctors-portal-firebase-adminsdk.json');
+
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -50,41 +48,35 @@ async function verifyToken(req, res, next){
 async function run() {
     try {
         await client.connect();
-        //console.log('Database connected successfully');
-      const database = client.db('doctors_portal');
-      const appointmentsCollection = database.collection('appointments');
-      //module-73#2
+        console.log('Database connected successfully');
+      const database = client.db('niche_product');
+      const productsCollection = database.collection('products');
+      //users 
       const usersCollection = database.collection('users');
+       //order collection
+       const orderCollection = database.collection('orders');
 
 
-      //load appointments from api based on user email#7
-      app.get('/appointments',verifyToken, async(req, res) => {
+      
+      app.get('/products',verifyToken, async(req, res) => {
         const email = req.query.email;
         //server time changed other country server site
-        const date =req.query.date; 
-         //filter by date
-            
-        // const date =new Date(req.query.date).toLocaleDateString();     
-        //console.log(date)
-        const query = { email: email, date: date }
+   const query = { email: email}
         // console.log(query)
 
-       
-  
-        const cursor = appointmentsCollection.find(query);
-        // const cursor = appointmentsCollection.find({});
-        const appointments = await cursor.toArray();
-        res.json(appointments);
+        const cursor = productsCollection.find(query);
+      
+        const products = await cursor.toArray();
+        res.json(products);
       })
-      //create appointment post & collect client side data
-      app.post('/appointments', async(req, res) =>{
-        const appointment = req.body;
-        // console.log(appointment); res.json({message : 'Not so good'})
-        const result = await appointmentsCollection.insertOne(appointment);
+
+      app.post('/products', async(req, res) =>{
+        const product = req.body;
+        const result = await productsCollection.insertOne(product);
         console.log(result);
        res.json(result);
       })
-//modules-73#6[one admin added with other email person easy]
+//[one admin added with other email person easy]
       app.get('/users/:email', async(req, res) => {
         const email = req.params.email;
         const query = { email: email };
@@ -96,7 +88,7 @@ async function run() {
         res.json({ admin: isAdmin });
       })
 
-      //module-73#2
+ 
       //user to the database
       app.post('/users',async(req, res) => {
         const user = req.body;
@@ -105,13 +97,13 @@ async function run() {
         res.json(result);
 
       });
-       //module-73#2
-       //backend data ke update 
+     
+       //backend data update 
        app.put('/users', async(req, res) => {
          const user = req.body;
-        //  console.log('put', user);
+    
          const filter = {email: user.email}
-          // this option instructs the method to create a document if no documents match the filter
+          
          const options = { upsert: true };
             // create a document that sets update
          const updateDoc = {$set: user};
@@ -121,7 +113,7 @@ async function run() {
       
        });
 
-       //module-73#5[make admin page]
+       //[make admin page]
        app.put('/users/admin', verifyToken, async(req, res) => {
          const user= req.body;
         //  console.log('decodedEmail', req.decodedEmail);
@@ -137,34 +129,13 @@ async function run() {
           }
          }
          
-        //  console.log('put', req.headers.authorization);
-        //  console.log('put', user);
-        //  const filter = { email: user.email };
-        //  const updateDoc = {$set: {role: 'admin'}};
-        //  const result = await usersCollection.updateOne(filter, updateDoc);
-        //  res.json(result);
+       
         else{
           res.status(403).json({message: 'you do not have access to make admin '}
           )
         }
        })
 
-
-
-
-
-
-
-//Api name convention-
-//app.get('/users')
-//app.post('/users')
-//app.get('/users/:id')
-//app.delete('/users/:id')
-//app.put('/users/:id')
- 
-//users : get
-      //users : post
-     
 
    
    
@@ -177,7 +148,7 @@ async function run() {
   run().catch(console.dir);
 
 app.get('/', (req, res) => {
-  res.send('Hello Doctor Portal!')
+  res.send('Hello Niche Product!')
 })
 
 app.listen(port, () => {
