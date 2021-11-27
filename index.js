@@ -11,7 +11,8 @@ const port = process.env.PORT || 5000
 
 //jwt token
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+// const serviceAccount = require('./doctors-portal-22630-firebase-adminsdk-obzfw-514841a19b.json'); 
+const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT); 
 
 
 admin.initializeApp({
